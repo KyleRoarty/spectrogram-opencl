@@ -4,7 +4,7 @@ import matplotlib.pyplot as plot
 import matplotlib.mlab as lab
 import scipy.signal as sp
 import scipy.fft as sfft
-from cmake_test import spectro
+from build.cmake_test import spectro
 
 audiodata, samplerate = sf.read('/home/kyle/Music/test.flac', dtype='float32')
 
