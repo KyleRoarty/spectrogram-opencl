@@ -4,11 +4,13 @@ import matplotlib.pyplot as plot
 import matplotlib.mlab as lab
 import scipy.signal as sp
 import scipy.fft as sfft
-from build.cmake_test import spectro
+from build.cmake_test import spectro,Spectrogram
 
 audiodata, samplerate = sf.read('/home/kyle/Music/test.flac', dtype='float32')
 
-otherdata = spectro(audiodata, samplerate)
+#otherdata = spectro(audiodata, samplerate)
+spec = Spectrogram()
+otherdata = spec.RunFFT(audiodata, 256, 128)
 
 #actualdata = np.zeros(129*10334, dtype='complex').reshape(10334,129)
 #

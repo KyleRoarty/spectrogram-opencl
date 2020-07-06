@@ -3,6 +3,7 @@
 #include <pybind11/stl.h>
 #include <stdlib.h>
 
+#include "Spectrogram.h"
 #include <clFFT.h>
 
 const char *precallbackstr = "\
@@ -202,5 +203,9 @@ PYBIND11_MODULE(cmake_test, m) {
     m.def("f", &f, "Test numpy arrays");
 
     m.def("spectro", &spectro, pybind11::return_value_policy::copy, "Do spectrogram of input data");
+
+    pybind11::class_<Spectrogram>(m, "Spectrogram")
+        .def(pybind11::init())
+        .def("RunFFT", &Spectrogram::RunFFT);
 }
 
