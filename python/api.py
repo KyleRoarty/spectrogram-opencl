@@ -16,7 +16,6 @@ app = Flask(__name__)
 @app.route('/upload', methods=['POST'])
 def fileUpload():
     uploaded_files = request.files.getlist("file")
-    print(uploaded_files)
 
     for f in uploaded_files:
         # Hash file because I'm weird
@@ -32,8 +31,7 @@ def fileUpload():
         target = os.path.join(UPLOAD_FOLDER, 'test', md5.hexdigest())
         if not os.path.isdir(target):
             os.makedirs(target) 
-        name = secure_filename(f.filename)
-        dest = os.path.join(target, name)
+        dest = os.path.join(target, f.filename)
         f.save(dest)
     return ""
 
