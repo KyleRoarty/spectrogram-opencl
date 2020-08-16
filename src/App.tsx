@@ -125,6 +125,18 @@ class App extends React.Component<AppProps, AppState> {
     )
   };
 
+  componentDidMount (): void {
+    fetch('/get-data', {
+      method: 'GET',
+    }).then(
+      (res) => {res.json().then(
+          (data) => {console.log(data); this.setState((state) => ({names: data.names})); console.log(this.state.names)},
+          () => {console.log("Err1")}
+        )},
+      () => {console.log("Err2")}
+    )
+  }
+
   render (): React.ReactElement {
     return (
       <div className="App">

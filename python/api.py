@@ -51,6 +51,15 @@ def fileUpload():
 
     return jsonify(names=retnames)
 
+@app.route('/get-data', methods=['GET'])
+def getFileNames():
+   retnames = []
+   deeb_data = query_db("select fname from audiofiles")
+   for dat in deeb_data:
+       retnames.append(dat["fname"]) 
+
+   return jsonify(names=retnames)
+
 
 init_app(app)
 CORS(app)
