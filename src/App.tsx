@@ -1,11 +1,11 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import AddIcon from '@material-ui/icons/Add'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import SkipNextIcon from '@material-ui/icons/SkipNext'
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
 import './App.css'
-import { Input, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody} from '@material-ui/core'
+import { Input, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 
@@ -14,11 +14,17 @@ type AppProps = {
 };
 
 type AppState = {
-  names: [];
+  names: string[];
+  selected: boolean[];
+  shiftSelected: boolean[];
+  shiftPivot: number;
 };
 class App extends React.Component<AppProps, AppState> {
   state: AppState = {
     names: [],
+    selected: [],
+    shiftSelected: [],
+    shiftPivot: -1,
   };
 
   useStyles = makeStyles((theme: Theme) =>
@@ -28,7 +34,10 @@ class App extends React.Component<AppProps, AppState> {
       },
       input: {
         display: "none",
-      }
+      },
+      noselect: {
+        "user-select": "none",
+      },
     }),
   );
   
@@ -46,7 +55,7 @@ class App extends React.Component<AppProps, AppState> {
       body: data,
     }).then(
       (res) => {res.json().then(
-          (data) => {console.log(data); this.setState((state) => ({names: data.names})); console.log(this.state.names)},
+          (data) => {console.log(data); this.setState((state) => ({names: data.names, selected: state.selected.concat(Array(data.names.length).fill(false)), shiftSelected: state.shiftSelected.concat(Array(data.names.length).fill(false))})); console.log(this.state.names)},
           () => {console.log("Err1")}
         )},
       () => {console.log("Err2")}
@@ -95,8 +104,36 @@ class App extends React.Component<AppProps, AppState> {
     )
   };
   
-  MakeTable = (): React.ReactElement => {
-    const data = ['Title']
+  MakeTable = (props: Object): React.ReactElement => {
+    const data = ['Title'];
+    const classes = this.useStyles();
+
+    const isSelected = (name: string) => (this.state.selected[this.state.names.indexOf(name)] || this.state.shiftSelected[this.state.names.indexOf(name)]);
+  
+
+    const handleClick = (event: React.MouseEvent<unknown>, name: string): void => {
+      const clickIdx = this.state.names.indexOf(name);
+      
+      if (event.ctrlKey) {
+        let newSelected: boolean[] = this.state.selected.map((set, idx) => { return set || this.state.shiftSelected[idx]; });
+        newSelected[clickIdx] = !newSelected[clickIdx];
+
+        this.setState((state) => ({selected: newSelected, shiftSelected: Array(this.state.shiftSelected.length).fill(false), shiftPivot: clickIdx}));
+      } else if (event.shiftKey) {
+        let end = this.state.shiftPivot === -1 ? clickIdx : this.state.shiftPivot;
+        const low: number = end > clickIdx ? clickIdx : end;
+        const high: number = end > clickIdx ? end : clickIdx;
+        let newSelected: boolean[] = Array(this.state.shiftSelected.length).fill(false);
+        if (low !== high)
+          newSelected.splice(low, high-low+1, ...Array(high-low+1).fill(true));
+        
+        this.setState((state) => ({shiftSelected: newSelected}));
+      } else {
+        let newSelected: boolean[] = Array(this.state.selected.length).fill(false);
+        newSelected[clickIdx] = true;
+        this.setState((state) => ({selected: newSelected, shiftSelected: Array(this.state.shiftSelected.length).fill(false), shiftPivot: clickIdx}));
+      }
+    };
   
     return (
       <Table
@@ -116,8 +153,11 @@ class App extends React.Component<AppProps, AppState> {
         </TableHead>
         <TableBody>
           {this.state.names.map((row) => (
-            <TableRow key={row}>
-              <TableCell align="left">{row}</TableCell>
+            <TableRow 
+              onClick={(event) => {handleClick(event, row)}}
+              selected={isSelected(row)}
+              key={row}>
+              <TableCell align="left" className={classes.noselect}>{row}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -130,7 +170,7 @@ class App extends React.Component<AppProps, AppState> {
       method: 'GET',
     }).then(
       (res) => {res.json().then(
-          (data) => {console.log(data); this.setState((state) => ({names: data.names})); console.log(this.state.names)},
+          (data) => {console.log(data); this.setState((state) => ({names: data.names, selected: Array(data.names.length).fill(false), shiftSelected: Array(data.names.length).fill(false)})); console.log(this.state.names)},
           () => {console.log("Err1")}
         )},
       () => {console.log("Err2")}
@@ -146,7 +186,7 @@ class App extends React.Component<AppProps, AppState> {
             <this.MakeButtonGroup />
           </div>
           <div className="Table">
-            {this.MakeTable()}
+            <this.MakeTable />
           </div>
         </TableContainer>
       </div>
