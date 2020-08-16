@@ -2,6 +2,7 @@ import React, { ChangeEvent } from 'react'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import AddIcon from '@material-ui/icons/Add'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
+import PauseIcon from '@material-ui/icons/Pause'
 import SkipNextIcon from '@material-ui/icons/SkipNext'
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
 import './App.css'
@@ -18,6 +19,8 @@ type AppState = {
   selected: boolean[];
   shiftSelected: boolean[];
   shiftPivot: number;
+  isFocus: boolean[];
+  isPlaying: boolean;
 };
 class App extends React.Component<AppProps, AppState> {
   state: AppState = {
@@ -25,6 +28,8 @@ class App extends React.Component<AppProps, AppState> {
     selected: [],
     shiftSelected: [],
     shiftPivot: -1,
+    isFocus: [],
+    isPlaying: false,
   };
 
   useStyles = makeStyles((theme: Theme) =>
@@ -55,7 +60,13 @@ class App extends React.Component<AppProps, AppState> {
       body: data,
     }).then(
       (res) => {res.json().then(
-          (data) => {console.log(data); this.setState((state) => ({names: data.names, selected: state.selected.concat(Array(data.names.length).fill(false)), shiftSelected: state.shiftSelected.concat(Array(data.names.length).fill(false))})); console.log(this.state.names)},
+          (data) => { console.log(data);
+                      this.setState((state) => ({ names: data.names,
+                                                  selected: state.selected.concat(Array(data.names.length).fill(false)),
+                                                  shiftSelected: state.shiftSelected.concat(Array(data.names.length).fill(false)),
+                                                  isFocus: state.isFocus.concat(Array(data.names.length).fill(false))}));
+                      console.log(this.state.names)
+                    },
           () => {console.log("Err1")}
         )},
       () => {console.log("Err2")}
@@ -94,8 +105,8 @@ class App extends React.Component<AppProps, AppState> {
         <IconButton>
           <SkipPreviousIcon/>
         </IconButton>
-        <IconButton>
-          <PlayArrowIcon/>
+        <IconButton onClick={() => {if(this.state.isFocus.some((ele) => {return ele;})) this.setState((state) => ({isPlaying: !state.isPlaying}))}}>
+          {this.state.isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
         </IconButton>
         <IconButton>
           <SkipNextIcon/>
@@ -109,6 +120,7 @@ class App extends React.Component<AppProps, AppState> {
     const classes = this.useStyles();
 
     const isSelected = (name: string) => (this.state.selected[this.state.names.indexOf(name)] || this.state.shiftSelected[this.state.names.indexOf(name)]);
+    const isFocus = (name: string) => (this.state.isFocus[this.state.names.indexOf(name)]);
   
 
     const handleClick = (event: React.MouseEvent<unknown>, name: string): void => {
@@ -134,6 +146,15 @@ class App extends React.Component<AppProps, AppState> {
         this.setState((state) => ({selected: newSelected, shiftSelected: Array(this.state.shiftSelected.length).fill(false), shiftPivot: clickIdx}));
       }
     };
+
+    const handleDoubleClick = (event: React.MouseEvent<unknown>, name: string): void => {
+      const clickIdx = this.state.names.indexOf(name);
+      let newFocus = Array(this.state.isFocus.length).fill(false);
+      newFocus[clickIdx] = true;
+
+      this.setState((state) => ({ isFocus: newFocus,
+                                  isPlaying: true}));
+    }
   
     return (
       <Table
@@ -143,6 +164,9 @@ class App extends React.Component<AppProps, AppState> {
         }}>
         <TableHead>
           <TableRow>
+              <TableCell padding="checkbox">
+                <PlayArrowIcon/>
+              </TableCell>
             {data.map((datum) => (
               <TableCell
                 align="center">
@@ -155,8 +179,10 @@ class App extends React.Component<AppProps, AppState> {
           {this.state.names.map((row) => (
             <TableRow 
               onClick={(event) => {handleClick(event, row)}}
+              onDoubleClick={(event) => {handleDoubleClick(event, row)}}
               selected={isSelected(row)}
               key={row}>
+              <TableCell padding="checkbox">{isFocus(row) ? (this.state.isPlaying ? <PlayArrowIcon/> : <PauseIcon/>) : null}</TableCell>
               <TableCell align="left" className={classes.noselect}>{row}</TableCell>
             </TableRow>
           ))}
@@ -170,7 +196,13 @@ class App extends React.Component<AppProps, AppState> {
       method: 'GET',
     }).then(
       (res) => {res.json().then(
-          (data) => {console.log(data); this.setState((state) => ({names: data.names, selected: Array(data.names.length).fill(false), shiftSelected: Array(data.names.length).fill(false)})); console.log(this.state.names)},
+          (data) => { console.log(data);
+                      this.setState((state) => ({ names: data.names,
+                                                  selected: Array(data.names.length).fill(false),
+                                                  shiftSelected: Array(data.names.length).fill(false),
+                                                  isFocus: Array(data.names.length).fill(false)}));
+                      console.log(this.state.names)
+                    },
           () => {console.log("Err1")}
         )},
       () => {console.log("Err2")}
