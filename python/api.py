@@ -17,6 +17,7 @@ app = Flask(__name__)
 def fileUpload():
     uploaded_files = request.files.getlist("file")
     retnames = []
+    new_files = False
 
     for f in uploaded_files:
         # Hash file because I'm weird
@@ -40,10 +41,14 @@ def fileUpload():
                 (target,f.filename,md5.hexdigest()))
             deeb.commit()
             close_db()
-            deeb_data = query_db("select fname from audiofiles")
-            for dat in deeb_data:
-                print(dat["fname"])
-                retnames.append(dat["fname"])
+            new_files = True
+
+    if new_files:
+        deeb_data = query_db("select fname from audiofiles")
+        for dat in deeb_data:
+            print(dat["fname"])
+            retnames.append(dat["fname"])
+
     return jsonify(names=retnames)
 
 
