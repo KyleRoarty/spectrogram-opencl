@@ -3,7 +3,7 @@
 import os
 import hashlib
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
 from db import init_app, query_db, get_db, close_db
@@ -60,6 +60,13 @@ def getFileNames():
 
    return jsonify(names=retnames)
 
+@app.route('/files/<path:filename>', methods=['GET'])
+def returnFile(filename):
+    #print(request.headers)
+    # Maybe check if file actually exists, but it should lmao
+    hash = query_db("select fhash from audiofiles where fname == '{}'".format(filename), (), one=True)
+
+    return send_from_directory(UPLOAD_FOLDER, '{}/{}/{}'.format('test', hash['fhash'], filename))
 
 init_app(app)
 CORS(app)

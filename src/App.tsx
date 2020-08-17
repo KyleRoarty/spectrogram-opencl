@@ -9,6 +9,7 @@ import './App.css'
 import { Input, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
+import Player from './Audio'
 
 type AppProps = {
 
@@ -105,9 +106,11 @@ class App extends React.Component<AppProps, AppState> {
         <IconButton>
           <SkipPreviousIcon/>
         </IconButton>
-        <IconButton onClick={() => {if(this.state.isFocus.some((ele) => {return ele;})) this.setState((state) => ({isPlaying: !state.isPlaying}))}}>
+        <Player url={this.state.isFocus.some((ele => {return ele;})) ? "/files/".concat(this.state.names[this.state.isFocus.indexOf(true)]) : null}/>
+        {/*<Player url={this.state.isFocus.some((ele => {return ele;})) ? "/files/".concat(this.state.names[this.state.isFocus.indexOf(true)]) : ""}/>
+        {/*<IconButton onClick={() => {if(this.state.isFocus.some((ele) => {return ele;})) this.setState((state) => ({isPlaying: !state.isPlaying}))}}>
           {this.state.isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
-        </IconButton>
+        </IconButton>*/}
         <IconButton>
           <SkipNextIcon/>
         </IconButton>
