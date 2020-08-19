@@ -3,13 +3,11 @@ import ButtonGroup from '@material-ui/core/ButtonGroup'
 import AddIcon from '@material-ui/icons/Add'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import PauseIcon from '@material-ui/icons/Pause'
-import SkipNextIcon from '@material-ui/icons/SkipNext'
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
 import './App.css'
 import { Input, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
-import Player from './Audio'
+import Player, { DefaultPlayer } from './Audio'
 
 type AppProps = {
 
@@ -99,21 +97,7 @@ class App extends React.Component<AppProps, AppState> {
       </ButtonGroup>
     )
   };
-  
-  MakeButtonGroup = (props: Object): React.ReactElement => {
-    return (
-      <ButtonGroup color="primary">
-        <IconButton>
-          <SkipPreviousIcon/>
-        </IconButton>
-        {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])}/> : <IconButton><PlayArrowIcon/></IconButton>}
-        <IconButton>
-          <SkipNextIcon/>
-        </IconButton>
-      </ButtonGroup>
-    )
-  };
-  
+ 
   MakeTable = (props: Object): React.ReactElement => {
     const data = ['Title'];
     const classes = this.useStyles();
@@ -214,7 +198,7 @@ class App extends React.Component<AppProps, AppState> {
           <TableContainer component={Paper}>
           <div className="Button">
             <this.MakeButton />
-            <this.MakeButtonGroup />
+            {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])}/> : <DefaultPlayer/>}
           </div>
           <div className="Table">
             <this.MakeTable />
