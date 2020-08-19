@@ -106,11 +106,7 @@ class App extends React.Component<AppProps, AppState> {
         <IconButton>
           <SkipPreviousIcon/>
         </IconButton>
-        <Player url={this.state.isFocus.some((ele => {return ele;})) ? "/files/".concat(this.state.names[this.state.isFocus.indexOf(true)]) : null}/>
-        {/*<Player url={this.state.isFocus.some((ele => {return ele;})) ? "/files/".concat(this.state.names[this.state.isFocus.indexOf(true)]) : ""}/>
-        {/*<IconButton onClick={() => {if(this.state.isFocus.some((ele) => {return ele;})) this.setState((state) => ({isPlaying: !state.isPlaying}))}}>
-          {this.state.isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
-        </IconButton>*/}
+        {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])}/> : <IconButton><PlayArrowIcon/></IconButton>}
         <IconButton>
           <SkipNextIcon/>
         </IconButton>

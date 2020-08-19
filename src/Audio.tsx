@@ -3,47 +3,50 @@ import IconButton from '@material-ui/core/IconButton'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import PauseIcon from '@material-ui/icons/Pause'
 
-const useAudio = () => {
-    const [audio] = useState(new Audio());
-    const [playing, setPlaying] = useState(false);
+const useAudio = (src: string) => {
+  const [audio] = useState(new Audio(src));
+  const [playing, setPlaying] = useState(true);
 
-    const toggle = (): void => {setPlaying(!playing)};
+  audio.volume = .05;
 
-    const setSource = (url: string): void => { audio.src = url;};
+  const toggle = (): void => {setPlaying(!playing)};
 
-    useEffect(() => {
-        playing ? audio.play() : audio.pause();
-    });
+  useEffect(() => {
+    if (src.localeCompare(audio.src))
+      audio.src = src;
+  }, [src, audio.src]);
 
-    useEffect(() => {
-        audio.addEventListener('ended', () => setPlaying(false));
-        return () => {
-            audio.removeEventListener('ended', () => setPlaying(false));
-        };
-    });
+  useEffect(() => {
+    playing ? audio.play() : audio.pause();
+  });
 
-    useEffect(() => {
-        audio.addEventListener('error', (e: ErrorEvent) => console.log(e));
-    });
+  useEffect(() => {
+    audio.addEventListener('ended', () => setPlaying(false));
+    return () => {
+        audio.removeEventListener('ended', () => setPlaying(false));
+    };
+  });
 
-    return {playing, toggle, setSource};
+  useEffect(() => {
+    audio.addEventListener('error', (e: ErrorEvent) => console.log(e));
+  });
+
+  return {playing, toggle};
 };
 
 type PlayerProps = {
-    url: string | null
+    url: string
 };
 
 const Player = (props: PlayerProps): React.ReactElement => {
-    console.log(props.url)
-    const {playing, toggle, setSource} = useAudio();
-    if (props?.url)
-        setSource(props.url) 
+  console.log(props.url)
+  const {playing, toggle} = useAudio(props.url);
 
-    return (
-        <IconButton onClick={() => {toggle()}}>
-            {playing ? <PauseIcon/> : <PlayArrowIcon/>}
-        </IconButton>
-    )
+  return (
+    <IconButton onClick={() => {toggle()}}>
+        {playing ? <PauseIcon/> : <PlayArrowIcon/>}
+    </IconButton>
+  )
 };
 
 export default Player;
