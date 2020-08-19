@@ -39,7 +39,6 @@ type PlayerProps = {
 };
 
 const Player = (props: PlayerProps): React.ReactElement => {
-  console.log(props.url)
   const {playing, toggle} = useAudio(props.url);
 
   return (
