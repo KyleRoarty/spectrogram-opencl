@@ -5,8 +5,11 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import PauseIcon from '@material-ui/icons/Pause'
 import SkipNextIcon from '@material-ui/icons/SkipNext'
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
+import Slider from '@material-ui/core/Slider'
 import VolSlider from './VolumeSlider'
 import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
+import Box from '@material-ui/core/Box'
 import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles({
@@ -14,11 +17,16 @@ const useStyles = makeStyles({
     display: "inline-flex",
     verticalAlign: "top"
   },
+  item: {
+    display: "flex",
+  },
 });
 
 const useAudio = (src: string, vol: number) => {
   const [audio] = useState(new Audio(src));
   const [playing, setPlaying] = useState(true);
+  const [time, setTime] = useState<number>(0);
+  const [dur, setDur] = useState<number>(0);
 
   const toggle = (): void => {setPlaying(!playing)};
 
@@ -48,7 +56,15 @@ const useAudio = (src: string, vol: number) => {
     audio.addEventListener('error', (e: ErrorEvent) => console.log(e));
   });
 
-  return {playing, toggle};
+  useEffect(() => {
+    audio.addEventListener('timeupdate', () => setTime(audio.currentTime))
+  });
+
+  useEffect(() => {
+    audio.addEventListener('durationchange', () => setDur(audio.duration))
+  });
+
+  return {playing, toggle, time, dur};
 };
 
 type PlayerProps = {
@@ -60,8 +76,10 @@ type PlayerProps = {
 
 const Player = (props: PlayerProps): React.ReactElement => {
   const [vol, setVol] = useState<number>(0.05);
-  const {playing, toggle} = useAudio(props.url, vol);
+  const {playing, toggle, time, dur} = useAudio(props.url, vol);
   const styles = useStyles();
+  const timeStr = new Date(1000 * time).toISOString().substr(11, 8);
+  const durStr = new Date(1000 * dur).toISOString().substr(11, 8);
 
   const volCallback = (newVol: number): void => {
     setVol(newVol);
@@ -73,7 +91,7 @@ const Player = (props: PlayerProps): React.ReactElement => {
   }
 
   return (
-    <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
+    <Grid container item xs={11} spacing={1} className={styles.root} alignItems="center" wrap="nowrap">
       <Grid item>
         <ButtonGroup color="primary">
           <IconButton onClick={props.prevCallback}>
@@ -87,7 +105,19 @@ const Player = (props: PlayerProps): React.ReactElement => {
           </IconButton>
         </ButtonGroup>
       </Grid>
-      <VolSlider updateCallback={volCallback} initVol={0.05}/>
+      <Grid item xs={7} className={styles.item}>
+        <Slider value={time} min={0} step={.01} max={dur} aria-labelledby="continuous-slider"/>
+      </Grid>
+      <Grid item xs={"auto"} className={styles.item} alignItems="center" justify="center">
+        <Typography id="audio-time">
+          <Box fontFamily="Monospace">
+            {timeStr}/{durStr}
+          </Box>
+        </Typography>
+      </Grid>
+      <Grid item xs={1} className={styles.item}>
+        <VolSlider updateCallback={volCallback} initVol={0.05}/>
+      </Grid>
     </Grid>
   )
 };
