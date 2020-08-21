@@ -215,13 +215,23 @@ class App extends React.Component<AppProps, AppState> {
     this.updatePlayingSong(-1)
   }
 
+  onPlayPauseClick = (playing: boolean): void => {
+    this.setState((state) => ({
+      isPlaying: playing
+    }));
+  }
+
   render (): React.ReactElement {
     return (
       <div className="App">
           <TableContainer component={Paper}>
           <div className="Button">
             <this.MakeButton />
-            {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])} nextCallback={this.onNextClick} prevCallback={this.onPrevClick}/> : <DefaultPlayer/>}
+            {this.state.isFocus.some((ele) => {return ele;}) ? <Player  url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])}
+                                                                        nextCallback={this.onNextClick}
+                                                                        prevCallback={this.onPrevClick}
+                                                                        playPauseCallback={this.onPlayPauseClick}/>
+                                                              : <DefaultPlayer/>}
           </div>
           <div className="Table">
             <this.MakeTable />

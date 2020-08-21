@@ -55,6 +55,7 @@ type PlayerProps = {
     url: string;
     prevCallback: () => void;
     nextCallback: () => void;
+    playPauseCallback: (play: boolean) => void;
 };
 
 const Player = (props: PlayerProps): React.ReactElement => {
@@ -66,6 +67,11 @@ const Player = (props: PlayerProps): React.ReactElement => {
     setVol(newVol);
   }
 
+  const playPauseClick = (): void => {
+    toggle()
+    props.playPauseCallback(!playing)
+  }
+
   return (
     <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
       <Grid item>
@@ -73,7 +79,7 @@ const Player = (props: PlayerProps): React.ReactElement => {
           <IconButton onClick={props.prevCallback}>
             <SkipPreviousIcon />
           </IconButton>
-          <IconButton onClick={() => {toggle()}}>
+          <IconButton onClick={playPauseClick}>
               {playing ? <PauseIcon/> : <PlayArrowIcon/>}
           </IconButton>
           <IconButton onClick={props.nextCallback}>
