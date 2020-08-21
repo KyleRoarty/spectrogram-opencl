@@ -21,6 +21,7 @@ type AppState = {
   isFocus: boolean[];
   isPlaying: boolean;
 };
+
 class App extends React.Component<AppProps, AppState> {
   state: AppState = {
     names: [],
@@ -192,13 +193,35 @@ class App extends React.Component<AppProps, AppState> {
     )
   }
 
+  updatePlayingSong = (change: number): void => {
+    let newIdx: number = (((this.state.isFocus.length + change) % this.state.isFocus.length) + this.state.isFocus.length)
+    if (this.state.isFocus.some((ele) => {return ele;})) {
+      newIdx = (((this.state.isFocus.indexOf(true) + change) % this.state.isFocus.length) + this.state.isFocus.length) % this.state.isFocus.length;
+    }
+
+    let newFocus: boolean[] = Array(this.state.isFocus.length).fill(false);
+    newFocus[newIdx] = true;
+
+    this.setState((state) => ({
+      isFocus: newFocus,
+    }));
+  }
+
+  onNextClick = (): void => {
+    this.updatePlayingSong(1)
+  }
+
+  onPrevClick = (): void => {
+    this.updatePlayingSong(-1)
+  }
+
   render (): React.ReactElement {
     return (
       <div className="App">
           <TableContainer component={Paper}>
           <div className="Button">
             <this.MakeButton />
-            {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])}/> : <DefaultPlayer/>}
+            {this.state.isFocus.some((ele) => {return ele;}) ? <Player url={"/files/".concat(this.state.names[this.state.isFocus.indexOf(true)])} nextCallback={this.onNextClick} prevCallback={this.onPrevClick}/> : <DefaultPlayer/>}
           </div>
           <div className="Table">
             <this.MakeTable />

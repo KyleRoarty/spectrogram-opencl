@@ -53,6 +53,8 @@ const useAudio = (src: string, vol: number) => {
 
 type PlayerProps = {
     url: string;
+    prevCallback: () => void;
+    nextCallback: () => void;
 };
 
 const Player = (props: PlayerProps): React.ReactElement => {
@@ -68,14 +70,14 @@ const Player = (props: PlayerProps): React.ReactElement => {
     <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
       <Grid item>
         <ButtonGroup color="primary">
-          <IconButton>
-            <SkipPreviousIcon/>
+          <IconButton onClick={props.prevCallback}>
+            <SkipPreviousIcon />
           </IconButton>
           <IconButton onClick={() => {toggle()}}>
               {playing ? <PauseIcon/> : <PlayArrowIcon/>}
           </IconButton>
-          <IconButton>
-            <SkipNextIcon/>
+          <IconButton onClick={props.nextCallback}>
+            <SkipNextIcon />
           </IconButton>
         </ButtonGroup>
       </Grid>
