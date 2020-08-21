@@ -23,7 +23,8 @@ const useAudio = (src: string, vol: number) => {
   const toggle = (): void => {setPlaying(!playing)};
 
   useEffect(() => {
-    if (src.localeCompare(audio.src))
+    const url: URL = new URL(window.location.protocol + "//" + window.location.host + src)
+    if (url.href.localeCompare(audio.src))
       audio.src = src;
   }, [src, audio.src]);
 
