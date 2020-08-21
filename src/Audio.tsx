@@ -5,12 +5,20 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import PauseIcon from '@material-ui/icons/Pause'
 import SkipNextIcon from '@material-ui/icons/SkipNext'
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
+import VolSlider from './VolumeSlider'
+import Grid from '@material-ui/core/Grid'
+import { makeStyles } from "@material-ui/core";
 
-const useAudio = (src: string) => {
+const useStyles = makeStyles({
+  root: {
+    display: "inline-flex",
+    verticalAlign: "top"
+  },
+});
+
+const useAudio = (src: string, vol: number) => {
   const [audio] = useState(new Audio(src));
   const [playing, setPlaying] = useState(true);
-
-  audio.volume = .05;
 
   const toggle = (): void => {setPlaying(!playing)};
 
@@ -18,6 +26,11 @@ const useAudio = (src: string) => {
     if (src.localeCompare(audio.src))
       audio.src = src;
   }, [src, audio.src]);
+
+  useEffect(() => {
+    if (vol !== audio.volume)
+      audio.volume = vol;
+  });
 
   useEffect(() => {
     playing ? audio.play() : audio.pause();
@@ -42,36 +55,58 @@ type PlayerProps = {
 };
 
 const Player = (props: PlayerProps): React.ReactElement => {
-  const {playing, toggle} = useAudio(props.url);
+  const [vol, setVol] = useState<number>(0.05);
+  const {playing, toggle} = useAudio(props.url, vol);
+  const styles = useStyles();
+
+  const volCallback = (newVol: number): void => {
+    setVol(newVol);
+  }
 
   return (
-    <ButtonGroup color="primary">
-      <IconButton>
-        <SkipPreviousIcon/>
-      </IconButton>
-      <IconButton onClick={() => {toggle()}}>
-          {playing ? <PauseIcon/> : <PlayArrowIcon/>}
-      </IconButton>
-      <IconButton>
-        <SkipNextIcon/>
-      </IconButton>
-    </ButtonGroup>
+    <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
+      <Grid item>
+        <ButtonGroup color="primary">
+          <IconButton>
+            <SkipPreviousIcon/>
+          </IconButton>
+          <IconButton onClick={() => {toggle()}}>
+              {playing ? <PauseIcon/> : <PlayArrowIcon/>}
+          </IconButton>
+          <IconButton>
+            <SkipNextIcon/>
+          </IconButton>
+        </ButtonGroup>
+      </Grid>
+      <VolSlider updateCallback={volCallback} initVol={0.05}/>
+    </Grid>
   )
 };
 
 const DefaultPlayer = (): React.ReactElement => {
+  const styles = useStyles()
+
+  const volCallback = (newVol: number): void => {
+
+  }
+
   return (
-    <ButtonGroup color="primary">
-      <IconButton>
-        <SkipPreviousIcon/>
-      </IconButton>
-      <IconButton>
-          <PlayArrowIcon/>
-      </IconButton>
-      <IconButton>
-        <SkipNextIcon/>
-      </IconButton>
-    </ButtonGroup>
+    <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
+      <Grid item>
+        <ButtonGroup color="primary">
+          <IconButton>
+            <SkipPreviousIcon/>
+          </IconButton>
+          <IconButton>
+              <PlayArrowIcon/>
+          </IconButton>
+          <IconButton>
+            <SkipNextIcon/>
+          </IconButton>
+        </ButtonGroup>
+      </Grid>
+      <VolSlider updateCallback={volCallback} initVol={0.05}/>
+    </Grid>
   )
 };
 
