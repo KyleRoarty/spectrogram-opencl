@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import IconButton from '@material-ui/core/IconButton'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
@@ -28,6 +28,10 @@ const useAudio = (src: string, vol: number) => {
   const [time, setTime] = useState<number>(0);
   const [dur, setDur] = useState<number>(0);
   const [canPlay, setCanPlay] = useState<boolean>(false)
+
+  const handleTime = useCallback(() => {
+    setTime(audio.currentTime);
+  }, [setTime]);
 
   const toggle = (): void => {setPlaying(!playing)};
 
@@ -66,15 +70,24 @@ const useAudio = (src: string, vol: number) => {
   });
 
   useEffect(() => {
-    audio.addEventListener('timeupdate', () => setTime(audio.currentTime))
+    audio.addEventListener('timeupdate', handleTime)
+    return () => {
+      audio.removeEventListener('timeupdate', () => setTime(0))
+    }
   });
 
   useEffect(() => {
     audio.addEventListener('durationchange', () => setDur(audio.duration))
+    return () => {
+      audio.removeEventListener('durationchange', () => {})
+    }
   });
 
   useEffect(() => {
     audio.addEventListener('canplaythrough', () => setCanPlay(true))
+    return () => {
+      audio.removeEventListener('canplaythrough', () => setCanPlay(false))
+    }
   });
 
   return {playing, toggle, time, dur};
