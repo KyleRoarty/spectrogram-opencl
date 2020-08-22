@@ -125,8 +125,8 @@ const Player = (props: PlayerProps): React.ReactElement => {
       <Grid item xs={7} className={styles.item}>
         <Slider value={time} min={0} step={.01} max={dur} aria-labelledby="continuous-slider"/>
       </Grid>
-      <Grid item xs={"auto"} className={styles.item} alignItems="center" justify="center">
-        <Typography id="audio-time">
+      <Grid item xs={"auto"} className={styles.item}>
+        <Typography component={"span"} id="audio-time">
           <Box fontFamily="Monospace">
             {timeStr}/{durStr}
           </Box>
@@ -147,7 +147,7 @@ const DefaultPlayer = (): React.ReactElement => {
   }
 
   return (
-    <Grid container spacing={0} sm={3} className={styles.root} wrap="nowrap">
+    <Grid container item spacing={0} xs={11} className={styles.root} wrap="nowrap">
       <Grid item>
         <ButtonGroup color="primary">
           <IconButton>

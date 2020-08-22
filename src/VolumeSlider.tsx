@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import VolumeDown from '@material-ui/icons/VolumeDown'
 import VolumeUp from '@material-ui/icons/VolumeUp'
 import Grid from '@material-ui/core/Grid'
 import Slider from '@material-ui/core/Slider'
 import { makeStyles } from '@material-ui/core/styles'
-import IconButton from '@material-ui/core/IconButton'
 
 type VSProps = {
   updateCallback: (newVol: number) => void;

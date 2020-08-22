@@ -153,6 +153,7 @@ class App extends React.Component<AppProps, AppState> {
               </TableCell>
             {data.map((datum) => (
               <TableCell
+                key={datum}
                 align="center">
                 {datum}
               </TableCell>
