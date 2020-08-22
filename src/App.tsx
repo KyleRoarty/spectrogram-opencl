@@ -190,6 +190,13 @@ class App extends React.Component<AppProps, AppState> {
         )},
       () => {console.log("Err2")}
     )
+
+    document.body.addEventListener('keyup', (event: KeyboardEvent) => this.handleDelete(event))
+
+  }
+
+  componentWillUnmount (): void {
+    document.body.removeEventListener('keyup', () => {})
   }
 
   updatePlayingSong = (change: number): void => {
@@ -219,7 +226,39 @@ class App extends React.Component<AppProps, AppState> {
       isPlaying: playing
     }));
   }
+  
+  handleDelete = (event: KeyboardEvent): void => {
+    const delNames = this.state.names.filter((name, idx) => this.state.selected[idx] || this.state.shiftSelected[idx])
+    const data = new FormData()
 
+    const newFocus = this.state.isFocus.filter((name, idx) => !this.state.selected[idx] && !this.state.shiftSelected[idx])
+    
+    // Delete key
+    if (event.keyCode === 46) {
+      delNames.forEach(file => data.append('files', file))
+
+      fetch('/delete', {
+        method: "POST",
+        body: data
+      }).then(
+        (res) => {res.json().then(
+          (data) => { console.log(data);
+                      this.setState((state) => ({ names: data.names,
+                                                  selected: Array(data.names.length).fill(false),
+                                                  shiftSelected: Array(data.names.length).fill(false),
+                                                  shiftPivot: -1,
+                                                  isFocus: newFocus}));
+                      console.log(this.state.names)
+                    },
+          () => {console.log("Err1")}
+        )},
+      () => {console.log("Err2")}
+
+      )
+    }
+
+  }
+ 
   render (): React.ReactElement {
     return (
       <div className="App">

@@ -3,6 +3,7 @@
 import os
 import hashlib
 import time
+import shutil
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
@@ -49,6 +50,29 @@ def fileUpload():
             print(dat["fname"])
             retnames.append(dat["fname"])
 
+    return jsonify(names=retnames)
+
+@app.route('/delete', methods=['POST'])
+def fileDelete():
+    files_to_delete = request.form.getlist("files")
+    deeb_data = query_db("select fname, fhash from audiofiles where fname in ({})".format(",".join(['?']*len(files_to_delete))), tuple(files_to_delete))
+
+    # Delete from DB
+    deeb = get_db()
+    cur = deeb.cursor()
+    cur.execute("DELETE FROM audiofiles WHERE fname in ({})".format(",".join(['?']*len(files_to_delete))), tuple(files_to_delete))
+    deeb.commit()
+    close_db()
+
+    # Delete hash folder that holds all files
+    for dat in deeb_data:
+        shutil.rmtree(os.path.join(UPLOAD_FOLDER, 'test', dat['fhash']), True)
+        
+    retnames = []
+    deeb_data = query_db("select fname from audiofiles")
+    for dat in deeb_data:
+        retnames.append(dat["fname"])
+    
     return jsonify(names=retnames)
 
 @app.route('/get-data', methods=['GET'])
