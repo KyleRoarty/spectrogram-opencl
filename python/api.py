@@ -53,20 +53,20 @@ def fileUpload():
 
 @app.route('/get-data', methods=['GET'])
 def getFileNames():
-   retnames = []
-   deeb_data = query_db("select fname from audiofiles")
-   for dat in deeb_data:
-       retnames.append(dat["fname"]) 
+    retnames = []
+    deeb_data = query_db("select fname from audiofiles")
+    for dat in deeb_data:
+        retnames.append(dat["fname"])
 
-   return jsonify(names=retnames)
+    return jsonify(names=retnames)
 
 @app.route('/files/<path:filename>', methods=['GET'])
 def returnFile(filename):
     #print(request.headers)
     # Maybe check if file actually exists, but it should lmao
-    hash = query_db("select fhash from audiofiles where fname == '{}'".format(filename), (), one=True)
+    hsh = query_db("select fhash from audiofiles where fname == '{}'".format(filename), (), one=True)
 
-    return send_from_directory(UPLOAD_FOLDER, '{}/{}/{}'.format('test', hash['fhash'], filename))
+    return send_from_directory(UPLOAD_FOLDER, '{}/{}/{}'.format('test', hsh['fhash'], filename))
 
 init_app(app)
 CORS(app)

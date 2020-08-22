@@ -79,11 +79,9 @@ class App extends React.Component<AppProps, AppState> {
     
     return (
       <ButtonGroup className={classes.test}>
-        <Input
-          inputProps={{
-            input: { accept: "audio/*" ,
-                     multiple: true }
-          }}
+        <input
+          accept="audio/*"
+          multiple={true}
           className={classes.input}
           id="icon-button-file"
           type="file"
@@ -139,7 +137,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({ isFocus: newFocus,
                                   isPlaying: true}));
     }
-  
+
     return (
       <Table
         size='small'
