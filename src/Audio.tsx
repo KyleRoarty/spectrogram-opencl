@@ -66,10 +66,6 @@ const useAudio = (src: string, vol: number) => {
   });
 
   useEffect(() => {
-    audio.addEventListener('error', (e: ErrorEvent) => console.log(e));
-  });
-
-  useEffect(() => {
     audio.addEventListener('timeupdate', () => setTime(audio.currentTime))
   });
 
