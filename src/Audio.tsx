@@ -23,17 +23,20 @@ const useStyles = makeStyles({
 });
 
 const useAudio = (src: string, vol: number) => {
-  const [audio] = useState(new Audio(src));
+  const [audio] = useState(new Audio());
   const [playing, setPlaying] = useState(true);
   const [time, setTime] = useState<number>(0);
   const [dur, setDur] = useState<number>(0);
+  const [canPlay, setCanPlay] = useState<boolean>(false)
 
   const toggle = (): void => {setPlaying(!playing)};
 
   useEffect(() => {
     const url: URL = new URL(window.location.protocol + "//" + window.location.host + src)
-    if (url.href.localeCompare(audio.src))
+    if (url.href.localeCompare(audio.src)){
       audio.src = src;
+      setCanPlay(false)
+    }
   }, [src, audio.src]);
 
   useEffect(() => {
@@ -42,7 +45,17 @@ const useAudio = (src: string, vol: number) => {
   });
 
   useEffect(() => {
-    playing ? audio.play() : audio.pause();
+    if (canPlay) {
+      if (playing) {
+        if (audio.paused) {
+          audio.play()
+        }
+      } else {
+        if (!audio.paused) {
+          audio.pause()
+        }
+      }
+    }
   });
 
   useEffect(() => {
@@ -62,6 +75,10 @@ const useAudio = (src: string, vol: number) => {
 
   useEffect(() => {
     audio.addEventListener('durationchange', () => setDur(audio.duration))
+  });
+
+  useEffect(() => {
+    audio.addEventListener('canplaythrough', () => setCanPlay(true))
   });
 
   return {playing, toggle, time, dur};
