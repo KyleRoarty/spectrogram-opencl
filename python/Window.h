@@ -34,8 +34,9 @@ uint outoffset, \
 __global void *userdata, \
 float2 fftoutput) \
 { \
-  int fft_offset = *((__global int *)userdata + 1); \
-  *((__global float2 *)output + outoffset + fft_offset + 1) = fftoutput; \
+  int out_len = *((__global int *)userdata) / 2 + 1; \
+  int fft_offset = out_len * (*((__global int *)userdata + 2)); \
+  *((__global float2 *)output + outoffset + fft_offset) = fftoutput; \
 }";
 
 }

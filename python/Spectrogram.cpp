@@ -66,19 +66,21 @@ Spectrogram::RunFFT(py::array_t<float, py::array::c_style | py::array::forcecast
     clfftSetPlanBatchSize(planHandle[0], num_ffts);
 
     // Generate userdata for callbacks
-    int (*h_userdata)[2] = new int[num_kerns][2];
+    const int num_userdata = 3;
+    int (*h_userdata)[num_userdata] = new int[num_kerns][num_userdata];
     cl_mem *userdata = new cl_mem[num_kerns];
 
     for(int i = 0; i < num_kerns; i++)
     {
         h_userdata[i][0] = (int)fft_len;
-        h_userdata[i][1] = (int)i * num_overlap;
-        userdata[i] = clCreateBuffer(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 2*sizeof(int), h_userdata[i], NULL);
+        h_userdata[i][1] = (int)i * (fft_len - num_overlap);
+        h_userdata[i][2] = (int)i;
+        userdata[i] = clCreateBuffer(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, num_userdata*sizeof(int), h_userdata[i], NULL);
     }
 
     // Set callbacks here
-    //clfftSetPlanCallback(planHandle[0], "hann", Window::hann, 0, PRECALLBACK, &userdata[0], 1);
-    clfftSetPlanCallback(planHandle[0], "none", Window::none, 0, PRECALLBACK, &userdata[0], 1);
+    clfftSetPlanCallback(planHandle[0], "hann", Window::hann, 0, PRECALLBACK, &userdata[0], 1);
+    //clfftSetPlanCallback(planHandle[0], "none", Window::none, 0, PRECALLBACK, &userdata[0], 1);
 
     clfftBakePlan(planHandle[0], 1, &queue, NULL, NULL);
 
@@ -86,8 +88,8 @@ Spectrogram::RunFFT(py::array_t<float, py::array::c_style | py::array::forcecast
     {
         clfftCopyPlan(&planHandle[i], ctx, planHandle[0]);
         // Set callbacks here
-        //clfftSetPlanCallback(planHandle[i], "hann", Window::hann, 0, PRECALLBACK, &userdata[i], 1);
-        clfftSetPlanCallback(planHandle[i], "none", Window::none, 0, PRECALLBACK, &userdata[i], 1);
+        clfftSetPlanCallback(planHandle[i], "hann", Window::hann, 0, PRECALLBACK, &userdata[i], 1);
+        //clfftSetPlanCallback(planHandle[i], "none", Window::none, 0, PRECALLBACK, &userdata[i], 1);
         clfftSetPlanCallback(planHandle[i], "post_offset", Window::post_offset, 0, POSTCALLBACK, &userdata[i], 1);
         clfftBakePlan(planHandle[i], 1, &queue, NULL, NULL);
     }
